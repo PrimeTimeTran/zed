@@ -188,12 +188,14 @@ impl BookmarkStore {
             .bookmarks
             .entry(abs_path.clone())
             .or_insert_with(|| BookmarkEntry::Loaded(BufferBookmarks::new(buffer.clone(), cx)));
-
+        eprintln!("Hi BookmarkStore");
+        eprintln!("Entry: {:?}", entry);
         let BookmarkEntry::Loaded(buffer_bookmarks) = entry else {
             unreachable!("resolve_if_needed should have converted to Loaded");
         };
-
         let snapshot = buffer.read(cx).text_snapshot();
+
+        eprintln!("snapshot: {:?}", snapshot.text());
 
         let existing_index = buffer_bookmarks.bookmarks.iter().position(|existing| {
             existing.anchor.summary::<Point>(&snapshot).row
@@ -425,6 +427,7 @@ impl BookmarkStore {
                     .or_default()
                     .extend(ranges);
             }
+            eprintln!("all_bookmark_locations: {:?}", locations);
 
             Ok(locations)
         })
@@ -496,17 +499,14 @@ async fn open_path(
             worktree_store.find_or_create_worktree(path, false, cx)
         })
         .await?;
-
     let project_path = ProjectPath {
         worktree_id: cx.read_entity(&worktree, |worktree, _| worktree.id()),
         path: worktree_path,
     };
-
     let buffer = cx
         .update_entity(&buffer_store, |buffer_store, cx| {
             buffer_store.open_buffer(project_path, cx)
         })
         .await?;
-
     Ok(buffer)
 }

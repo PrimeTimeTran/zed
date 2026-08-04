@@ -778,6 +778,7 @@ impl RequestHandler<'_> {
 
     async fn handle_find_first_match(&self, mut entry: MatchingEntry) {
         async move {
+            
             let abs_path = entry.worktree_root.join(entry.path.path.as_std_path());
             let Some(file) = self
                 .fs

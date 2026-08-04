@@ -1803,6 +1803,7 @@ impl LocalWorktree {
         has_bom: bool,
         cx: &Context<Worktree>,
     ) -> Task<Result<Arc<File>>> {
+        eprintln!("Hi Write File");
         let fs = self.fs.clone();
         let is_private = self.is_path_private(&path);
         let abs_path = self.absolutize(&path);

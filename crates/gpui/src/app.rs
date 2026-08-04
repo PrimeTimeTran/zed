@@ -2972,6 +2972,7 @@ pub struct GpuiBorrow<'a, T> {
     app: &'a mut App,
 }
 
+
 impl<'a, T: 'static> GpuiBorrow<'a, T> {
     fn new(inner: Entity<T>, app: &'a mut App) -> Self {
         app.start_update();

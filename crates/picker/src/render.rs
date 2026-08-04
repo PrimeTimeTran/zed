@@ -280,7 +280,21 @@ impl<D: PickerDelegate> Picker<D> {
             });
 
         let Some(aside) = aside else {
-            return menu;
+            return div()
+                .relative()
+                .child(menu)
+                .child(
+                    div()
+                        .absolute()
+                        .left_0()
+                        .bottom_0()
+                        // .translate_y(px(40.0))
+                        .w_64()
+                        .p_2()
+                        .elevation_2(cx)
+                        .child(Label::new("Command Palette Sidecar"))
+                );
+            // return menu;
         };
 
         let render_aside = |aside: DocumentationAside, cx: &mut Context<Self>| {

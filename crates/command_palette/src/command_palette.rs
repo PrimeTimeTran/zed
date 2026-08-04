@@ -23,7 +23,7 @@ use picker::Direction;
 use picker::{Picker, PickerDelegate};
 use postage::{sink::Sink, stream::Stream};
 use settings::Settings;
-use ui::{HighlightedLabel, KeyBinding, ListItem, ListItemSpacing, prelude::*};
+use ui::{Divider, HighlightedLabel, KeyBinding, ListItem, ListItemSpacing, prelude::*};
 use util::ResultExt;
 use workspace::{ModalView, Workspace, WorkspaceSettings};
 use zed_actions::{OpenZedUrl, command_palette::Toggle};
@@ -34,6 +34,17 @@ pub fn init(cx: &mut App) {
 }
 
 impl ModalView for CommandPalette {}
+
+enum PaletteMode {
+    Normal,
+}
+struct ActionId;
+
+struct CommandPaletteState {
+    mode: PaletteMode,
+    recent: Vec<ActionId>,
+    usage: HashMap<ActionId, u64>,
+}
 
 pub struct CommandPalette {
     picker: Entity<Picker<CommandPaletteDelegate>>,
@@ -131,6 +142,7 @@ impl CommandPalette {
             entity,
             commands,
             previous_focus_handle,
+            PaletteMode::Normal,
         );
 
         let picker = cx.new(|cx| {
@@ -158,12 +170,275 @@ impl Focusable for CommandPalette {
     }
 }
 
+use gpui::rgb;
+// Relative parent:
+//     defines the universe
+
+// Absolute child:
+//     escapes normal layout
+
+// left_full:
+//     attach to left boundary
+
+// right_full:
+//     attach to right boundary
+
+// top_full:
+//     attach below
+
+// bottom_full:
+//     attach above
 impl Render for CommandPalette {
-    fn render(&mut self, _window: &mut Window, _: &mut Context<Self>) -> impl IntoElement {
-        v_flex()
+    // .bg(rgb(0xff0000))
+    // .bg(cx.theme().colors().danger)
+
+    // With Sidebar
+    // fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+    //     return div()
+    //         .key_context("CommandPalette")
+    //         .relative()
+    //         .child(self.picker.clone())
+    //         .child(
+    //             div()
+    //                 .absolute()
+    //                 .left_full()
+    //                 .top_0()
+    //                 .ml_2()
+    //                 .w_64()
+    //                 .h_full()
+    //                 .elevation_2(cx)
+    //                 .p_2()
+    //                 .child(
+    //                     v_flex()
+    //                         .gap_2()
+    //                         .child(Label::new("Mode"))
+    //                         .child(Label::new("Recent"))
+    //                         .child(Label::new("Unexplored"))
+    //                         .child(Label::new("Learning")),
+    //                 ),
+    //         )
+    // }
+
+    // With Left Sidecar
+    // fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+    //     return div()
+    //         .key_context("CommandPalette")
+    //         .relative()
+    //         .child(self.picker.clone())
+    //         .child(
+    //             div()
+    //                 .absolute()
+    //                 .left(px(-300.0))
+    //                 .top_0()
+    //                 .w(px(280.0))
+    //                 .h_full()
+    //                 .elevation_2(cx)
+    //                 .child(Label::new("LEFT TEST"))
+    //         )
+    // }
+    fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+        // Top Rail, Bottom Rail, Left Sidecar
+        div()
             .key_context("CommandPalette")
+            .relative()
             .child(self.picker.clone())
+        
+            // LEFT SIDECAR
+            .child(
+                div()
+                    .absolute()
+                    .left(px(-300.0))
+                    .top_0()
+                    .w(px(280.0))
+                    .h_full()
+                    .elevation_2(cx)
+                    .p_2()
+                    .child(
+                        v_flex()
+                            .gap_2()
+                            .child(Label::new("Commands"))
+                            .child(Label::new("Recent"))
+                            .child(Label::new("Learning"))
+                    )
+            )
+        
+            // TOP RAIL
+            .child(
+                div()
+                    .absolute()
+                    .top(px(-50.0))
+                    .left(px(-300.0))
+                    .w(px(1200.0))
+                    .h(px(40.0))
+                    .elevation_2(cx)
+                    .p_2()
+                    .child(
+                        h_flex()
+                            .gap_4()
+                            .child(Label::new("⌘ Palette"))
+                            .child(Label::new("Recent 12"))
+                            .child(Label::new("Unexplored 5"))
+                            .child(Label::new("Learning 3"))
+                    )
+            )
+        
+            // BOTTOM RAIL
+            .child(
+                div()
+                    .absolute()
+                    .bottom(px(-50.0))
+                    .left(px(-300.0))
+                    .w(px(1200.0))
+                    .h(px(40.0))
+                    .elevation_2(cx)
+                    .p_2()
+                    .child(
+                        h_flex()
+                            .gap_4()
+                            .child(Label::new("↑↓ Navigate"))
+                            .child(Label::new("↵ Run"))
+                            .child(Label::new("Esc Close"))
+                    )
+            )
+
+        // div()
+        //     .key_context("CommandPalette")
+        //     .relative()
+        //     .child(self.picker.clone())
+        //     .child(
+        //         div()
+        //             .absolute()
+        //             .left(px(-300.0))
+        //             .top(px(0.0))
+        //             .w(px(1200.0))
+        //             .h(px(40.0))
+        //             .elevation_2(cx)
+        //             .p_2()
+        //             .child(
+        //                 h_flex()
+        //                     .gap_4()
+        //                     .child(Label::new("↑↓ Navigate"))
+        //                     .child(Label::new("↵ Run"))
+        //                     .child(Label::new("Esc Close"))
+        //             )
+        //     )
+        // div()
+        //     .key_context("CommandPalette")
+        //     .relative()
+        //     .child(self.picker.clone())
+        //     .child(
+        //         div()
+        //             .absolute()
+        //             .left(px(-300.0))
+        //             .top_0()
+        //             .w(px(280.0))
+        //             .h_full()
+        //             .elevation_2(cx)
+        //             .child(Label::new("LEFT TEST"))
+        //     )
+            // .child(
+            //     div()
+            //         .absolute()
+            //         .right_full()
+            //         .mr_2()
+            //         .h_full()
+            //         .w_80()
+            //         .elevation_2(cx)
+            //         .flex()
+            //         .child(
+            //             // side rail
+            //             v_flex()
+            //                 .w_10()
+            //                 .h_full()
+            //                 .items_center()
+            //                 .gap_2()
+            //                 .p_2()
+            //                 .child(
+            //                     div()
+            //                         .size_8()
+            //                         .rounded_full()
+            //                         .bg(gpui::rgb(0x333333))
+            //                         .child(Label::new("⌘"))
+            //                 )
+            //                 .child(
+            //                     div()
+            //                         .size_8()
+            //                         .rounded_full()
+            //                         .bg(gpui::rgb(0x333333))
+            //                         .child(Label::new("⌕"))
+            //                 )
+            //                 .child(
+            //                     div()
+            //                         .relative()
+            //                         .size_8()
+            //                         .rounded_full()
+            //                         .bg(gpui::rgb(0x333333))
+            //                         .child(Label::new("★"))
+            //                         .child(
+            //                             div()
+            //                                 .absolute()
+            //                                 .right_0()
+            //                                 .top_0()
+            //                                 .size_3()
+            //                                 .rounded_full()
+            //                                 .bg(gpui::rgb(0xff0000))
+            //                         )
+            //                 )
+            //         )
+            //         .child(
+            //             // main side panel
+            //             v_flex()
+            //                 .flex_grow(256.0)
+            //                 .gap_2()
+            //                 .p_2()
+            //                 .child(
+            //                     // top rail
+            //                     h_flex()
+            //                         .w_full()
+            //                         .gap_2()
+            //                         .child(Label::new("Recent"))
+            //                         .child(Label::new("Learning"))
+            //                         .child(Label::new("3"))
+            //                 )
+            //                 .child(
+            //                     Divider::horizontal()
+            //                 )
+            //                 .child(
+            //                     Label::new("Command Palette Sidecar")
+            //                 )
+            //                 .child(
+            //                     Label::new("1  Fold All")
+            //                 )
+            //                 .child(
+            //                     Label::new("2  Rename Symbol")
+            //                 )
+            //         )
+            // )
+
     }
+
+    // forces a static height.
+    // fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+    //     div()
+    //         .key_context("CommandPalette")
+    //         .child(
+    //             v_flex()
+    //                 .child(self.picker.clone())
+    //                 .child(
+    //                     div()
+    //                         .w_full()
+    //                         .mt_2()
+    //                         .p_2()
+    //                         .border_t_1()
+    //                         .border_color(cx.theme().colors().border_variant)
+    //                         .child(
+    //                             Label::new(
+    //                                 "💡 Hold ⌘⇧P, then press 1 to instantly trigger a command"
+    //                             )
+    //                         )
+    //                 )
+    //         )
+    // }
 }
 
 pub struct CommandPaletteDelegate {
@@ -180,6 +455,8 @@ pub struct CommandPaletteDelegate {
         postage::dispatch::Receiver<(Vec<Command>, Vec<StringMatch>, CommandInterceptResult)>,
     )>,
     query_history: QueryHistory,
+    mode: PaletteMode,
+    show_sidecar: bool,
 }
 
 struct Command {
@@ -287,8 +564,11 @@ impl CommandPaletteDelegate {
         workspace: WeakEntity<Workspace>,
         commands: Vec<Command>,
         previous_focus_handle: FocusHandle,
+        mode: PaletteMode,
     ) -> Self {
         Self {
+            mode,
+            show_sidecar: true,
             command_palette,
             workspace,
             all_commands: commands.clone(),
