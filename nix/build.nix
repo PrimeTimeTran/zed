@@ -323,6 +323,7 @@ craneLib.buildPackage (
     # without the env var generate-licenses fails due to crane's fetchCargoVendor, see:
     # https://github.com/zed-industries/zed/issues/19971#issuecomment-2688455390
     # TODO: put this in a separate derivation that depends on src to avoid running it on every build
+    # [[loi] nix/buildnix]
     preBuild = ''
       ALLOW_MISSING_LICENSES=yes bash script/generate-licenses
       echo nightly > crates/zed/RELEASE_CHANNEL

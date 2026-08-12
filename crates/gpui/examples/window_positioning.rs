@@ -16,6 +16,8 @@ struct WindowContent {
 impl Render for WindowContent {
     fn render(&mut self, window: &mut Window, _: &mut Context<Self>) -> impl IntoElement {
         let window_bounds = window.bounds();
+        // [[loi] window_positioning.rs render]
+        eprintln!("Render Window Content render");
 
         div()
             .flex()

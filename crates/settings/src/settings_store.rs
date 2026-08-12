@@ -1318,6 +1318,7 @@ impl SettingsStore {
     /// Generate JSON schema for project settings, including only settings valid
     /// for project-level configurations.
     pub fn project_json_schema(params: &SettingsJsonSchemaParams) -> Value {
+        // [[loi] settings_store.rs project_json_schema]
         let mut generator = schemars::generate::SchemaSettings::draft2019_09()
             .with_transform(DefaultDenyUnknownFields)
             .with_transform(AllowTrailingCommas)

@@ -45,7 +45,8 @@ impl WindowsDisplay {
             (monitor_size.right - monitor_size.left).into(),
             (monitor_size.bottom - monitor_size.top).into(),
         );
-
+        // [[loi] display.rs]
+        eprintln!("WindowsDisplay new");
         Some(WindowsDisplay {
             handle,
             display_id,

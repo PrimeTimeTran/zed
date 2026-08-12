@@ -249,11 +249,9 @@ impl Component for Headline {
     fn scope() -> ComponentScope {
         ComponentScope::Typography
     }
-
     fn description() -> &'static str {
         "A headline element used to emphasize text and create visual hierarchy in the UI."
     }
-
     fn preview(_window: &mut Window, _cx: &mut App) -> AnyElement {
         v_flex()
             .gap_1()

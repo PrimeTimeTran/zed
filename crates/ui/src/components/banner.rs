@@ -140,6 +140,7 @@ impl Component for Banner {
     }
 
     fn preview(_window: &mut Window, _cx: &mut App) -> AnyElement {
+      // [[loi] banner.rs preview]
         let severity_examples = vec![
             single_example(
                 "Default",
@@ -183,8 +184,8 @@ impl Component for Banner {
                     .into_any_element(),
             ),
         ];
-
-        example_group(severity_examples)
+        let severity_examples2 = vec![];
+        example_group(severity_examples2)
             .vertical()
             .into_any_element()
     }

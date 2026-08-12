@@ -25,6 +25,8 @@ pub enum SchemaType {
     Theme,
     IconTheme,
     Project,
+    Settings,
+    KeyMap,
 }
 
 fn main() -> Result<()> {
@@ -42,6 +44,14 @@ fn main() -> Result<()> {
             serde_json::to_string_pretty(&schema)?
         }
         SchemaType::Project => {
+            let schema = schema_for!(ProjectSettingsContent);
+            serde_json::to_string_pretty(&schema)?
+        }
+        SchemaType::Settings => {
+            let schema = schema_for!(ProjectSettingsContent);
+            serde_json::to_string_pretty(&schema)?
+        }
+        SchemaType::KeyMap => {
             let schema = schema_for!(ProjectSettingsContent);
             serde_json::to_string_pretty(&schema)?
         }

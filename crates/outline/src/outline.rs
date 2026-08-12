@@ -32,6 +32,10 @@ pub fn init(cx: &mut App) {
         .ok();
 }
 
+// [[loi] outline.rs]
+// - Render json "right"
+// - Focus events.
+// - "State" like "isOpen" "isVisible"
 pub fn toggle(
     editor: Entity<Editor>,
     _: &zed_actions::outline::ToggleOutline,

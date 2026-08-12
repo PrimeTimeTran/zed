@@ -22,6 +22,7 @@ const ELLIPSIS: SharedString = SharedString::new_static("…");
 pub trait Styled: Sized {
     /// Returns a reference to the style memory of this element.
     fn style(&mut self) -> &mut StyleRefinement;
+    // [[loi] styled.rs]
 
     gpui_macros::style_helpers!();
     gpui_macros::visibility_style_methods!();

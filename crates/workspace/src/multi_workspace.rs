@@ -337,6 +337,8 @@ impl MultiWorkspace {
 
     pub fn new(workspace: Entity<Workspace>, window: &mut Window, cx: &mut Context<Self>) -> Self {
         let release_subscription = cx.on_release(|this: &mut MultiWorkspace, _cx| {
+            // [[loi] multi_workspace.rs new]
+            eprintln!("MultiWorkspace new");
             if let Some(task) = this._serialize_task.take() {
                 task.detach();
             }
@@ -410,6 +412,11 @@ impl MultiWorkspace {
     }
 
     pub fn sidebar_open(&self) -> bool {
+        // [[loi] multi workspace sidebar_open]
+        eprintln!(
+            "Multi Workspace Sidebar (Multi workspace) Open?  self.sidebar_open {} ",
+            self.sidebar_open
+        );
         self.sidebar_open
     }
 
@@ -430,6 +437,8 @@ impl MultiWorkspace {
     }
 
     pub fn toggle_sidebar(&mut self, window: &mut Window, cx: &mut Context<Self>) {
+        // [loi]
+        eprintln!("Sidebar toggle");
         if !self.multi_workspace_enabled(cx) {
             return;
         }
@@ -1541,6 +1550,8 @@ impl MultiWorkspace {
         window: &mut Window,
         cx: &mut Context<Self>,
     ) -> Option<Entity<T>> {
+        // [loi]
+        eprintln!("focus_panel");
         self.workspace()
             .update(cx, |workspace, cx| workspace.focus_panel::<T>(window, cx))
     }
@@ -1565,6 +1576,8 @@ impl MultiWorkspace {
         window: &mut Window,
         cx: &mut Context<Self>,
     ) {
+        // [loi]
+        eprintln!("Toggle dock");
         self.workspace().update(cx, |workspace, cx| {
             workspace.toggle_dock(dock_side, window, cx);
         });
@@ -2011,6 +2024,8 @@ impl MultiWorkspace {
 
 impl Render for MultiWorkspace {
     fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+        // [loi]
+        eprintln!("Render Multi Workspace render");
         let multi_workspace_enabled = self.multi_workspace_enabled(cx);
         let sidebar_side = self.sidebar_side(cx);
         let sidebar_on_right = sidebar_side == SidebarSide::Right;

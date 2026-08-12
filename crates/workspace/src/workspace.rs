@@ -9001,6 +9001,8 @@ impl Render for Workspace {
             log::info!("Rendered first frame");
         }
 
+        // [loi] read
+        eprintln!("Render Workspace render");
         let centered_layout = self.centered_layout
             && self.center.panes().len() == 1
             && self.active_item(cx).is_some();

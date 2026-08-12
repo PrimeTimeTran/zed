@@ -188,19 +188,17 @@ impl BookmarkStore {
             .bookmarks
             .entry(abs_path.clone())
             .or_insert_with(|| BookmarkEntry::Loaded(BufferBookmarks::new(buffer.clone(), cx)));
-        eprintln!("Hi BookmarkStore");
-        eprintln!("Entry: {:?}", entry);
+        // [[loi] bookmark_store.rs render]
         let BookmarkEntry::Loaded(buffer_bookmarks) = entry else {
             unreachable!("resolve_if_needed should have converted to Loaded");
         };
         let snapshot = buffer.read(cx).text_snapshot();
 
-        eprintln!("snapshot: {:?}", snapshot.text());
-
-        let existing_index = buffer_bookmarks.bookmarks.iter().position(|existing| {
-            existing.anchor.summary::<Point>(&snapshot).row
-                == anchor.summary::<Point>(&snapshot).row
-        });
+        let existing_index = buffer_bookmarks.bookmarks
+            .iter()
+            .position(|existing| {
+                existing.anchor.summary::<Point>(&snapshot).row == anchor.summary::<Point>(&snapshot).row
+            });
 
         if let Some(index) = existing_index {
             buffer_bookmarks.bookmarks.remove(index);
@@ -218,7 +216,7 @@ impl BookmarkStore {
         &mut self,
         buffer: &Entity<Buffer>,
         anchor: text::Anchor,
-        cx: &mut Context<Self>,
+        cx: &mut Context<Self>
     ) -> Option<&Bookmark> {
         let Some(abs_path) = Self::abs_path_from_buffer(buffer, cx) else {
             return None;
@@ -226,8 +224,7 @@ impl BookmarkStore {
 
         self.resolve_anchors_if_needed(&abs_path, buffer, cx);
 
-        let entry = self
-            .bookmarks
+        let entry = self.bookmarks
             .entry(abs_path.clone())
             .or_insert_with(|| BookmarkEntry::Loaded(BufferBookmarks::new(buffer.clone(), cx)));
 
@@ -237,10 +234,11 @@ impl BookmarkStore {
 
         let snapshot = buffer.read(cx).text_snapshot();
 
-        buffer_bookmarks.bookmarks.iter().find(|existing| {
-            existing.anchor.summary::<Point>(&snapshot).row
-                == anchor.summary::<Point>(&snapshot).row
-        })
+        buffer_bookmarks.bookmarks
+            .iter()
+            .find(|existing| {
+                existing.anchor.summary::<Point>(&snapshot).row == anchor.summary::<Point>(&snapshot).row
+            })
     }
 
     pub fn edit_bookmark(
@@ -248,7 +246,7 @@ impl BookmarkStore {
         buffer: &Entity<Buffer>,
         anchor: text::Anchor,
         label: String,
-        cx: &mut Context<Self>,
+        cx: &mut Context<Self>
     ) {
         let Some(abs_path) = Self::abs_path_from_buffer(buffer, cx) else {
             return;
@@ -256,18 +254,17 @@ impl BookmarkStore {
 
         self.resolve_anchors_if_needed(&abs_path, buffer, cx);
 
-        let Some(BookmarkEntry::Loaded(buffer_bookmarks)) = self.bookmarks.get_mut(&abs_path)
-        else {
+        let Some(BookmarkEntry::Loaded(buffer_bookmarks)) = self.bookmarks.get_mut(&abs_path) else {
             return;
         };
 
         let snapshot = buffer.read(cx).text_snapshot();
         let row = anchor.summary::<Point>(&snapshot).row;
 
-        if let Some(bookmark) = buffer_bookmarks
-            .bookmarks
-            .iter_mut()
-            .find(|existing| existing.anchor.summary::<Point>(&snapshot).row == row)
+        if
+            let Some(bookmark) = buffer_bookmarks.bookmarks
+                .iter_mut()
+                .find(|existing| existing.anchor.summary::<Point>(&snapshot).row == row)
         {
             bookmark.label = label;
             cx.notify();
@@ -282,7 +279,7 @@ impl BookmarkStore {
         buffer: Entity<Buffer>,
         range: Range<text::Anchor>,
         buffer_snapshot: &BufferSnapshot,
-        cx: &mut Context<Self>,
+        cx: &mut Context<Self>
     ) -> Vec<Bookmark> {
         let Some(abs_path) = Self::abs_path_from_buffer(&buffer, cx) else {
             return Vec::new();
@@ -294,8 +291,7 @@ impl BookmarkStore {
             return Vec::new();
         };
 
-        file_bookmarks
-            .bookmarks
+        file_bookmarks.bookmarks
             .iter()
             .filter_map({
                 move |bookmark| {
@@ -303,8 +299,9 @@ impl BookmarkStore {
                         return None;
                     }
 
-                    if bookmark.anchor.cmp(&range.start, buffer_snapshot).is_lt()
-                        || bookmark.anchor.cmp(&range.end, buffer_snapshot).is_gt()
+                    if
+                        bookmark.anchor.cmp(&range.start, buffer_snapshot).is_lt() ||
+                        bookmark.anchor.cmp(&range.end, buffer_snapshot).is_gt()
                     {
                         return None;
                     }
@@ -318,16 +315,17 @@ impl BookmarkStore {
     fn handle_file_changed(&mut self, buffer: Entity<Buffer>, cx: &mut Context<Self>) {
         let entity_id = buffer.entity_id();
 
-        if buffer
-            .read(cx)
-            .file()
-            .is_none_or(|f| f.disk_state().is_deleted())
+        if
+            buffer
+                .read(cx)
+                .file()
+                .is_none_or(|f| f.disk_state().is_deleted())
         {
-            self.bookmarks.retain(|_, entry| match entry {
-                BookmarkEntry::Loaded(buffer_bookmarks) => {
-                    buffer_bookmarks.buffer.entity_id() != entity_id
+            self.bookmarks.retain(|_, entry| {
+                match entry {
+                    BookmarkEntry::Loaded(buffer_bookmarks) => { buffer_bookmarks.buffer.entity_id() != entity_id }
+                    BookmarkEntry::Unloaded(_) => true,
                 }
-                BookmarkEntry::Unloaded(_) => true,
             });
             cx.notify();
             return;
@@ -338,22 +336,22 @@ impl BookmarkStore {
                 return;
             }
 
-            if let Some(old_path) = self
-                .bookmarks
-                .iter()
-                .find(|(_, entry)| match entry {
-                    BookmarkEntry::Loaded(buffer_bookmarks) => {
-                        buffer_bookmarks.buffer.entity_id() == entity_id
-                    }
-                    BookmarkEntry::Unloaded(_) => false,
-                })
-                .map(|(path, _)| path)
-                .cloned()
+            if
+                let Some(old_path) = self.bookmarks
+                    .iter()
+                    .find(|(_, entry)| {
+                        match entry {
+                            BookmarkEntry::Loaded(buffer_bookmarks) => {
+                                buffer_bookmarks.buffer.entity_id() == entity_id
+                            }
+                            BookmarkEntry::Unloaded(_) => false,
+                        }
+                    })
+                    .map(|(path, _)| path)
+                    .cloned()
             {
                 let Some(entry) = self.bookmarks.remove(&old_path) else {
-                    log::error!(
-                        "Couldn't get bookmarks from old path during buffer rename handling"
-                    );
+                    log::error!("Couldn't get bookmarks from old path during buffer rename handling");
                     return;
                 };
                 self.bookmarks.insert(new_abs_path, entry);
@@ -362,10 +360,7 @@ impl BookmarkStore {
         }
     }
 
-    pub fn all_serialized_bookmarks(
-        &self,
-        cx: &App,
-    ) -> BTreeMap<Arc<Path>, Vec<SerializedBookmark>> {
+    pub fn all_serialized_bookmarks(&self, cx: &App) -> BTreeMap<Arc<Path>, Vec<SerializedBookmark>> {
         self.bookmarks
             .iter()
             .filter_map(|(path, entry)| {
@@ -373,15 +368,13 @@ impl BookmarkStore {
                     BookmarkEntry::Unloaded(rows) => rows.clone(),
                     BookmarkEntry::Loaded(buffer_bookmarks) => {
                         let snapshot = buffer_bookmarks.buffer.read(cx).snapshot();
-                        buffer_bookmarks
-                            .bookmarks
+                        buffer_bookmarks.bookmarks
                             .iter()
                             .filter_map(|bookmark| {
                                 if !snapshot.can_resolve(&bookmark.anchor) {
                                     return None;
                                 }
-                                let row =
-                                    snapshot.summary_for_anchor::<Point>(&bookmark.anchor).row;
+                                let row = snapshot.summary_for_anchor::<Point>(&bookmark.anchor).row;
                                 Some(SerializedBookmark {
                                     row,
                                     label: bookmark.label.clone(),
@@ -405,7 +398,7 @@ impl BookmarkStore {
 
     pub async fn all_bookmark_locations(
         this: Entity<BookmarkStore>,
-        cx: &mut (impl AppContext + Clone),
+        cx: &mut (impl AppContext + Clone)
     ) -> Result<HashMap<Entity<Buffer>, Vec<Range<Point>>>> {
         Self::resolve_all(&this, cx).await?;
 
@@ -422,10 +415,7 @@ impl BookmarkStore {
                     })
                     .collect();
 
-                locations
-                    .entry(bookmarks.buffer().clone())
-                    .or_default()
-                    .extend(ranges);
+                locations.entry(bookmarks.buffer().clone()).or_default().extend(ranges);
             }
             eprintln!("all_bookmark_locations: {:?}", locations);
 
@@ -438,9 +428,11 @@ impl BookmarkStore {
         let unloaded_paths: Vec<Arc<Path>> = cx.read_entity(&this, |this, _| {
             this.bookmarks
                 .iter()
-                .filter_map(|(path, entry)| match entry {
-                    BookmarkEntry::Unloaded(_) => Some(path.clone()),
-                    BookmarkEntry::Loaded(_) => None,
+                .filter_map(|(path, entry)| {
+                    match entry {
+                        BookmarkEntry::Unloaded(_) => Some(path.clone()),
+                        BookmarkEntry::Loaded(_) => None,
+                    }
                 })
                 .collect_vec()
         });
@@ -463,14 +455,10 @@ impl BookmarkStore {
 
         let opened: Vec<_> = open_tasks
             .inspect_err(|(path, error)| {
-                log::warn!(
-                    "Could not open buffer for bookmarked path {}: {error}",
-                    path.display()
-                )
+                log::warn!("Could not open buffer for bookmarked path {}: {error}", path.display())
             })
             .filter_map(|res| async move { res.ok() })
-            .collect()
-            .await;
+            .collect().await;
 
         cx.update_entity(&this, |this, cx| {
             for (path, buffer) in opened {
@@ -492,21 +480,17 @@ async fn open_path(
     path: &Path,
     worktree_store: &Entity<WorktreeStore>,
     buffer_store: &Entity<BufferStore>,
-    mut cx: impl AppContext,
+    mut cx: impl AppContext
 ) -> Result<Entity<Buffer>> {
-    let (worktree, worktree_path) = cx
-        .update_entity(&worktree_store, |worktree_store, cx| {
-            worktree_store.find_or_create_worktree(path, false, cx)
-        })
-        .await?;
+    let (worktree, worktree_path) = cx.update_entity(&worktree_store, |worktree_store, cx| {
+        worktree_store.find_or_create_worktree(path, false, cx)
+    }).await?;
     let project_path = ProjectPath {
         worktree_id: cx.read_entity(&worktree, |worktree, _| worktree.id()),
         path: worktree_path,
     };
-    let buffer = cx
-        .update_entity(&buffer_store, |buffer_store, cx| {
-            buffer_store.open_buffer(project_path, cx)
-        })
-        .await?;
+    let buffer = cx.update_entity(&buffer_store, |buffer_store, cx| {
+        buffer_store.open_buffer(project_path, cx)
+    }).await?;
     Ok(buffer)
 }

@@ -1891,6 +1891,8 @@ impl Window {
         }));
         platform_window.on_input({
             let mut cx = cx.to_async();
+            // [[loi] window.rs]
+            eprintln!("platform_window.on_input");
             Box::new(move |event| {
                 handle
                     .update(&mut cx, |_, window, cx| window.dispatch_event(event, cx))
@@ -6542,6 +6544,8 @@ impl<V: 'static + Render> WindowHandle<V> {
     ///
     /// This will fail if the window is closed or if the root view's type does not match `V`.
     pub fn read<'a>(&self, cx: &'a App) -> Result<&'a V> {
+        // [[loi] window.rs read]
+        eprintln!("Window Read");
         let x = cx
             .windows
             .get(self.id)

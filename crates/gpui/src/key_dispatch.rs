@@ -1,3 +1,4 @@
+// [[loi] key_dispatch.rs]
 //! KeyDispatch is where GPUI deals with binding actions to key events.
 //!
 //! The key pieces to making a key binding work are to define an action,
@@ -486,9 +487,13 @@ impl DispatchTree {
         keystroke: Keystroke,
         dispatch_path: &SmallVec<[DispatchNodeId; 32]>,
     ) -> DispatchResult {
+        // [[loi] key_dispatch.rs]
         input.push(keystroke.clone());
         let (bindings, pending, context_stack) = self.bindings_for_input(&input, dispatch_path);
-
+        eprintln!(
+            "dispatch_key input {:?} keystroke{:?} dispatch_path{:?}  bindings{:?} pending{:?} context_stack{:?}",
+            input, keystroke, dispatch_path, bindings, pending, context_stack
+        );
         if pending {
             return DispatchResult {
                 pending: input,
@@ -511,8 +516,11 @@ impl DispatchTree {
         input.pop();
 
         let (suffix, mut to_replay) = self.replay_prefix(input, dispatch_path);
-
         let mut result = self.dispatch_key(suffix, keystroke, dispatch_path);
+        eprintln!(
+            "dispatch_key result {:?} result.to_reply{:?}",
+            result, result.to_replay
+        );
         to_replay.extend(result.to_replay);
         result.to_replay = to_replay;
         result

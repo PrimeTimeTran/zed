@@ -18,6 +18,8 @@ struct WindowShadow {}
 
 impl Render for WindowShadow {
     fn render(&mut self, window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
+        // [[loi] window_shadow.rs render]
+        eprintln!("Render Window Shadow render");
         let decorations = window.window_decorations();
         let rounding = px(10.0);
         let shadow_size = px(10.0);

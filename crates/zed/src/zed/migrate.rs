@@ -113,7 +113,7 @@ impl MigrationBanner {
             ),
             None => return,
         };
-
+        // [[loi] migrate.rs thinks theres a migration]
         let migration_text = format!(
             "Your {} file uses deprecated settings which can be \
             automatically updated. A backup will be saved to `{}`",

@@ -83,6 +83,8 @@ impl CommandPalette {
         _window: Option<&mut Window>,
         _: &mut Context<Workspace>,
     ) {
+        // [[loi] command_palette.rs]
+        eprintln!("Command Palette Register");
         workspace.register_action(|workspace, _: &Toggle, window, cx| {
             Self::toggle(workspace, "", window, cx)
         });
@@ -120,6 +122,8 @@ impl CommandPalette {
         window: &mut Window,
         cx: &mut Context<Self>,
     ) -> Self {
+        // [loi]
+        eprintln!("Command Palette Register new");
         let filter = CommandPaletteFilter::try_global(cx);
 
         let commands = window
@@ -188,6 +192,9 @@ use gpui::rgb;
 
 // bottom_full:
 //     attach above
+// [loi]
+// Create extensions to
+// Anchor CRUD commands to daemon/lsp/process
 impl Render for CommandPalette {
     // .bg(rgb(0xff0000))
     // .bg(cx.theme().colors().danger)
@@ -242,7 +249,6 @@ impl Render for CommandPalette {
             .key_context("CommandPalette")
             .relative()
             .child(self.picker.clone())
-        
             // LEFT SIDECAR
             .child(
                 div()
@@ -258,10 +264,9 @@ impl Render for CommandPalette {
                             .gap_2()
                             .child(Label::new("Commands"))
                             .child(Label::new("Recent"))
-                            .child(Label::new("Learning"))
-                    )
+                            .child(Label::new("Learning")),
+                    ),
             )
-        
             // TOP RAIL
             .child(
                 div()
@@ -278,10 +283,9 @@ impl Render for CommandPalette {
                             .child(Label::new("⌘ Palette"))
                             .child(Label::new("Recent 12"))
                             .child(Label::new("Unexplored 5"))
-                            .child(Label::new("Learning 3"))
-                    )
+                            .child(Label::new("Learning 3")),
+                    ),
             )
-        
             // BOTTOM RAIL
             .child(
                 div()
@@ -297,8 +301,8 @@ impl Render for CommandPalette {
                             .gap_4()
                             .child(Label::new("↑↓ Navigate"))
                             .child(Label::new("↵ Run"))
-                            .child(Label::new("Esc Close"))
-                    )
+                            .child(Label::new("Esc Close")),
+                    ),
             )
 
         // div()
@@ -336,85 +340,84 @@ impl Render for CommandPalette {
         //             .elevation_2(cx)
         //             .child(Label::new("LEFT TEST"))
         //     )
-            // .child(
-            //     div()
-            //         .absolute()
-            //         .right_full()
-            //         .mr_2()
-            //         .h_full()
-            //         .w_80()
-            //         .elevation_2(cx)
-            //         .flex()
-            //         .child(
-            //             // side rail
-            //             v_flex()
-            //                 .w_10()
-            //                 .h_full()
-            //                 .items_center()
-            //                 .gap_2()
-            //                 .p_2()
-            //                 .child(
-            //                     div()
-            //                         .size_8()
-            //                         .rounded_full()
-            //                         .bg(gpui::rgb(0x333333))
-            //                         .child(Label::new("⌘"))
-            //                 )
-            //                 .child(
-            //                     div()
-            //                         .size_8()
-            //                         .rounded_full()
-            //                         .bg(gpui::rgb(0x333333))
-            //                         .child(Label::new("⌕"))
-            //                 )
-            //                 .child(
-            //                     div()
-            //                         .relative()
-            //                         .size_8()
-            //                         .rounded_full()
-            //                         .bg(gpui::rgb(0x333333))
-            //                         .child(Label::new("★"))
-            //                         .child(
-            //                             div()
-            //                                 .absolute()
-            //                                 .right_0()
-            //                                 .top_0()
-            //                                 .size_3()
-            //                                 .rounded_full()
-            //                                 .bg(gpui::rgb(0xff0000))
-            //                         )
-            //                 )
-            //         )
-            //         .child(
-            //             // main side panel
-            //             v_flex()
-            //                 .flex_grow(256.0)
-            //                 .gap_2()
-            //                 .p_2()
-            //                 .child(
-            //                     // top rail
-            //                     h_flex()
-            //                         .w_full()
-            //                         .gap_2()
-            //                         .child(Label::new("Recent"))
-            //                         .child(Label::new("Learning"))
-            //                         .child(Label::new("3"))
-            //                 )
-            //                 .child(
-            //                     Divider::horizontal()
-            //                 )
-            //                 .child(
-            //                     Label::new("Command Palette Sidecar")
-            //                 )
-            //                 .child(
-            //                     Label::new("1  Fold All")
-            //                 )
-            //                 .child(
-            //                     Label::new("2  Rename Symbol")
-            //                 )
-            //         )
-            // )
-
+        // .child(
+        //     div()
+        //         .absolute()
+        //         .right_full()
+        //         .mr_2()
+        //         .h_full()
+        //         .w_80()
+        //         .elevation_2(cx)
+        //         .flex()
+        //         .child(
+        //             // side rail
+        //             v_flex()
+        //                 .w_10()
+        //                 .h_full()
+        //                 .items_center()
+        //                 .gap_2()
+        //                 .p_2()
+        //                 .child(
+        //                     div()
+        //                         .size_8()
+        //                         .rounded_full()
+        //                         .bg(gpui::rgb(0x333333))
+        //                         .child(Label::new("⌘"))
+        //                 )
+        //                 .child(
+        //                     div()
+        //                         .size_8()
+        //                         .rounded_full()
+        //                         .bg(gpui::rgb(0x333333))
+        //                         .child(Label::new("⌕"))
+        //                 )
+        //                 .child(
+        //                     div()
+        //                         .relative()
+        //                         .size_8()
+        //                         .rounded_full()
+        //                         .bg(gpui::rgb(0x333333))
+        //                         .child(Label::new("★"))
+        //                         .child(
+        //                             div()
+        //                                 .absolute()
+        //                                 .right_0()
+        //                                 .top_0()
+        //                                 .size_3()
+        //                                 .rounded_full()
+        //                                 .bg(gpui::rgb(0xff0000))
+        //                         )
+        //                 )
+        //         )
+        //         .child(
+        //             // main side panel
+        //             v_flex()
+        //                 .flex_grow(256.0)
+        //                 .gap_2()
+        //                 .p_2()
+        //                 .child(
+        //                     // top rail
+        //                     h_flex()
+        //                         .w_full()
+        //                         .gap_2()
+        //                         .child(Label::new("Recent"))
+        //                         .child(Label::new("Learning"))
+        //                         .child(Label::new("3"))
+        //                 )
+        //                 .child(
+        //                     Divider::horizontal()
+        //                 )
+        //                 .child(
+        //                     Label::new("Command Palette Sidecar")
+        //                 )
+        //                 .child(
+        //                     Label::new("1  Fold All")
+        //                 )
+        //                 .child(
+        //                     Label::new("2  Rename Symbol")
+        //                 )
+        //         )
+        // )
     }
 
     // forces a static height.
@@ -526,7 +529,7 @@ impl QueryHistory {
         let selected = self.validate_cursor(current_query, cx)?;
         let prefix = self.prefix.clone().unwrap_or_default();
 
-        for i in (selected + 1)..self.history(cx).len() {
+        for i in selected + 1..self.history(cx).len() {
             if self
                 .history(cx)
                 .get(i)
@@ -566,6 +569,8 @@ impl CommandPaletteDelegate {
         previous_focus_handle: FocusHandle,
         mode: PaletteMode,
     ) -> Self {
+        // [loi]
+        eprintln!("CommandPaletteDelegate new");
         Self {
             mode,
             show_sidecar: true,
@@ -616,7 +621,7 @@ impl CommandPaletteDelegate {
                 string: string.into(),
                 positions,
                 score: 0.0,
-            })
+            });
         }
         if !intercept_result.exclusive {
             new_matches.append(&mut matches);
@@ -782,9 +787,9 @@ impl PickerDelegate for CommandPaletteDelegate {
                 let intercept_result = if is_zed_link {
                     CommandInterceptResult {
                         results: vec![CommandInterceptItem {
-                            action: OpenZedUrl {
+                            action: (OpenZedUrl {
                                 url: query_for_link.clone().into(),
-                            }
+                            })
                             .boxed_clone(),
                             string: query_for_link,
                             positions: vec![],
