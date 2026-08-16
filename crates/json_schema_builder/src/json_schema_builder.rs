@@ -45,7 +45,6 @@ pub fn collect_macro(mac: &syn::Macro, commands: &mut BTreeSet<String>) {
         }
     }
 }
-
 pub fn collect_file(path: &Path, commands: &mut BTreeSet<String>) {
     eprintln!("  reading: {}", path.display());
     let source = match fs::read_to_string(path) {

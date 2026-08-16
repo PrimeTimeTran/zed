@@ -265,6 +265,7 @@ fn main() {
 
     if args.dump_all_actions {
         dump_all_gpui_actions();
+        dump_actions_schema();
         return;
     }
 
@@ -2001,6 +2002,21 @@ fn dump_all_gpui_actions() {
         serde_json::to_string_pretty(&output).unwrap().as_bytes(),
     )
     .unwrap();
+}
+
+fn dump_actions_schema() {
+    let output = std::path::Path::new("schemas/actions.schema.json");
+
+    std::fs::create_dir_all(output.parent().unwrap()).expect("Failed to create schemas directory");
+
+    let schema = settings::KeymapFile::generate_json_schema_from_inventory();
+
+    let formatted =
+        serde_json::to_string_pretty(&schema).expect("Failed to serialize action schema");
+
+    std::fs::write(output, formatted + "\n").expect("Failed to write action schema");
+
+    println!("Wrote {}", output.display());
 }
 
 #[cfg(target_os = "windows")]

@@ -1,0 +1,907 @@
+{
+  "type": "array",
+  "items": {
+    "$ref": "#/$defs/KeymapSection"
+  },
+  "description": "Keymap configuration consisting of sections. Each section may have a context predicate which\ndetermines whether its bindings are used.",
+  "title": "KeymapFile",
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$defs": {
+    "KeymapAction": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ActionName"
+        },
+        {
+          "$ref": "#/$defs/ActionWithArguments"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "ActionName": {
+      "anyOf": [
+        {
+          "description": "Action with special handling which unbinds later bindings for the same keystrokes when they\ndispatch the named action, regardless of that action's context.\n\nIn keymap JSON this is written as:\n\n`[\"zed::Unbind\", \"editor::NewLine\"]`",
+          "type": "string",
+          "const": "zed::Unbind"
+        },
+        {
+          "description": "Action with special handling which unbinds the keybinding this is associated with,\nif it is the highest precedence match.",
+          "type": "string",
+          "const": "zed::NoAction",
+          "deprecationMessage": "Deprecated, use null"
+        },
+        {
+          "description": "Unstages the current hunk and moves to the next one.",
+          "type": "string",
+          "const": "git::UnstageAndNext"
+        },
+        {
+          "description": "Stages the current hunk and moves to the next one.",
+          "type": "string",
+          "const": "git::StageAndNext"
+        },
+        {
+          "description": "Stage status entries between an anchor entry and the cursor.",
+          "type": "string",
+          "const": "git::StageRange"
+        },
+        {
+          "description": "Toggles the staged state of the hunk or status entry at cursor.",
+          "type": "string",
+          "const": "git::ToggleStaged"
+        },
+        {
+          "description": "Shows git blame information for the current file.",
+          "type": "string",
+          "const": "git::Blame"
+        },
+        {
+          "type": "string",
+          "const": "editor::ToggleGitBlame",
+          "deprecationMessage": "Deprecated, use git::Blame"
+        },
+        {
+          "description": "Restores the selected hunks to their original state and moves to the\nnext one.",
+          "type": "string",
+          "const": "git::RestoreAndNext"
+        },
+        {
+          "description": "Restores the selected hunks to their original state.",
+          "type": "string",
+          "const": "git::Restore"
+        },
+        {
+          "type": "string",
+          "const": "editor::RevertSelectedHunks",
+          "deprecationMessage": "Deprecated, use git::Restore"
+        },
+        {
+          "description": "Restores a file to its last committed state, discarding local changes.",
+          "type": "string",
+          "const": "git::RestoreFile"
+        },
+        {
+          "type": "string",
+          "const": "editor::RevertFile",
+          "deprecationMessage": "Deprecated, use git::RestoreFile"
+        },
+        {
+          "type": "string",
+          "const": "git::ViewCommit"
+        },
+        {
+          "description": "Clones a repository.",
+          "type": "string",
+          "const": "git::Clone"
+        },
+        {
+          "description": "Opens the current file in a solo diff view.",
+          "type": "string",
+          "const": "git::OpenFileDiff"
+        },
+        {
+          "description": "Opens all modified files in the editor.",
+          "type": "string",
+          "const": "git::OpenModifiedFiles"
+        },
+        {
+          "description": "Renames a git branch.",
+          "type": "string",
+          "const": "git::RenameBranch"
+        },
+        {
+          "description": "Copies the current branch name to the clipboard.",
+          "type": "string",
+          "const": "git::CopyBranchName"
+        },
+        {
+          "description": "Adds a file to the repository's .git/info/exclude.",
+          "type": "string",
+          "const": "git::AddToGitInfoExclude"
+        },
+        {
+          "description": "Adds a file to .gitignore.",
+          "type": "string",
+          "const": "git::AddToGitignore"
+        },
+        {
+          "description": "Initializes a new git repository.",
+          "type": "string",
+          "const": "git::Init"
+        },
+        {
+          "description": "Enable the --signoff option.",
+          "type": "string",
+          "const": "git::Signoff"
+        },
+        {
+          "description": "Amends the last commit with staged changes.",
+          "type": "string",
+          "const": "git::Amend"
+        },
+        {
+          "description": "Runs the next commit with `git commit --no-verify`.",
+          "type": "string",
+          "const": "git::SkipHooks"
+        },
+        {
+          "description": "Creates a new commit with staged changes.",
+          "type": "string",
+          "const": "git::Commit"
+        },
+        {
+          "description": "Generates a commit message using AI.",
+          "type": "string",
+          "const": "git::GenerateCommitMessage"
+        },
+        {
+          "description": "Toggles whether the commit message editor fills all the available\nvertical space within the git panel.",
+          "type": "string",
+          "const": "git::ToggleFillCommitEditor"
+        },
+        {
+          "description": "Expands the commit message editor.",
+          "type": "string",
+          "const": "git::ExpandCommitEditor"
+        },
+        {
+          "description": "Cancels the current git operation.",
+          "type": "string",
+          "const": "git::Cancel"
+        },
+        {
+          "description": "Fetches changes from a specific remote.",
+          "type": "string",
+          "const": "git::FetchFrom"
+        },
+        {
+          "description": "Pushes commits to a specific remote branch.",
+          "type": "string",
+          "const": "git::PushTo"
+        },
+        {
+          "description": "Pushes commits to the remote repository.",
+          "type": "string",
+          "const": "git::Push"
+        },
+        {
+          "description": "Undoes the last commit, keeping changes in the working directory.",
+          "type": "string",
+          "const": "git::Uncommit"
+        },
+        {
+          "description": "Fetches changes from the remote repository.",
+          "type": "string",
+          "const": "git::Fetch"
+        },
+        {
+          "description": "Pulls changes from the remote repository with rebase.",
+          "type": "string",
+          "const": "git::PullRebase"
+        },
+        {
+          "description": "Pulls changes from the remote repository.",
+          "type": "string",
+          "const": "git::Pull"
+        },
+        {
+          "description": "Force pushes commits to the remote repository.",
+          "type": "string",
+          "const": "git::ForcePush"
+        },
+        {
+          "description": "Moves all untracked files to trash.",
+          "type": "string",
+          "const": "git::TrashUntrackedFiles"
+        },
+        {
+          "description": "Restores all tracked files to their last committed state.",
+          "type": "string",
+          "const": "git::RestoreTrackedFiles"
+        },
+        {
+          "description": "Stages all changes in the repository.",
+          "type": "string",
+          "const": "git::StageAll"
+        },
+        {
+          "description": "Unstages the current file.",
+          "type": "string",
+          "const": "git::UnstageFile"
+        },
+        {
+          "description": "Stages the current file.",
+          "type": "string",
+          "const": "git::StageFile"
+        },
+        {
+          "description": "Apply the most recent stash.",
+          "type": "string",
+          "const": "git::StashApply"
+        },
+        {
+          "description": "Pops the most recent stash.",
+          "type": "string",
+          "const": "git::StashPop"
+        },
+        {
+          "description": "Stashes all changes in the repository, including untracked files.",
+          "type": "string",
+          "const": "git::StashAll"
+        },
+        {
+          "description": "Unstages all changes in the repository.",
+          "type": "string",
+          "const": "git::UnstageAll"
+        },
+        {
+          "description": "Opens the selected file in the editor without a diff view.",
+          "type": "string",
+          "const": "git::ViewFile"
+        },
+        {
+          "description": "Shows the git history for the selected file, folder, or project.",
+          "type": "string",
+          "const": "git::FileHistory"
+        },
+        {
+          "description": "Runs a sequence of actions.\n\nNOTE: This does **not** wait for asynchronous actions to complete before running the next action.",
+          "type": "string",
+          "const": "action::Sequence"
+        }
+      ]
+    },
+    "ActionWithArguments": {
+      "anyOf": [
+        {
+          "type": "array",
+          "items": [
+            {
+              "description": "No action named this.",
+              "type": "string",
+              "const": "",
+              "deprecationMessage": "No action named this."
+            },
+            true
+          ],
+          "minItems": 2,
+          "maxItems": 2
+        },
+        {
+          "type": "array",
+          "items": [
+            {
+              "description": "Action with special handling which unbinds later bindings for the same keystrokes when they\ndispatch the named action, regardless of that action's context.\n\nIn keymap JSON this is written as:\n\n`[\"zed::Unbind\", \"editor::NewLine\"]`",
+              "const": "zed::Unbind"
+            },
+            {
+              "description": "Action with special handling which unbinds later bindings for the same keystrokes when they\ndispatch the named action, regardless of that action's context.\n\nIn keymap JSON this is written as:\n\n`[\"zed::Unbind\", \"editor::NewLine\"]`",
+              "type": "string"
+            }
+          ],
+          "minItems": 2,
+          "maxItems": 2
+        },
+        {
+          "type": "array",
+          "items": [
+            {
+              "description": "Restores a file to its last committed state, discarding local changes.",
+              "const": "git::RestoreFile"
+            },
+            {
+              "description": "Restores a file to its last committed state, discarding local changes.",
+              "type": "object",
+              "properties": {
+                "skip_prompt": {
+                  "type": "boolean",
+                  "default": false
+                }
+              },
+              "additionalProperties": false
+            }
+          ],
+          "minItems": 2,
+          "maxItems": 2
+        },
+        {
+          "type": "array",
+          "items": [
+            {
+              "const": "editor::RevertFile",
+              "deprecationMessage": "Deprecated, use git::RestoreFile"
+            },
+            {
+              "description": "Restores a file to its last committed state, discarding local changes.",
+              "type": "object",
+              "properties": {
+                "skip_prompt": {
+                  "type": "boolean",
+                  "default": false
+                }
+              },
+              "additionalProperties": false
+            }
+          ],
+          "minItems": 2,
+          "maxItems": 2
+        },
+        {
+          "type": "array",
+          "items": [
+            {
+              "description": "Renames a git branch.",
+              "const": "git::RenameBranch"
+            },
+            {
+              "description": "Renames a git branch.",
+              "type": "object",
+              "properties": {
+                "branch": {
+                  "description": "The branch to rename.\n\nDefault: the current branch.",
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null
+                }
+              },
+              "additionalProperties": false
+            }
+          ],
+          "minItems": 2,
+          "maxItems": 2
+        },
+        {
+          "type": "array",
+          "items": [
+            {
+              "description": "Runs a sequence of actions.\n\nNOTE: This does **not** wait for asynchronous actions to complete before running the next action.",
+              "const": "action::Sequence"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/KeymapAction"
+              }
+            }
+          ],
+          "minItems": 2,
+          "maxItems": 2
+        },
+        {
+          "type": "array",
+          "items": [
+            {
+              "enum": [
+                "zed::NoAction",
+                "git::UnstageAndNext",
+                "git::StageAndNext",
+                "git::StageRange",
+                "git::ToggleStaged",
+                "git::Blame",
+                "editor::ToggleGitBlame",
+                "git::RestoreAndNext",
+                "git::Restore",
+                "editor::RevertSelectedHunks",
+                "git::ViewCommit",
+                "git::Clone",
+                "git::OpenFileDiff",
+                "git::OpenModifiedFiles",
+                "git::CopyBranchName",
+                "git::AddToGitInfoExclude",
+                "git::AddToGitignore",
+                "git::Init",
+                "git::Signoff",
+                "git::Amend",
+                "git::SkipHooks",
+                "git::Commit",
+                "git::GenerateCommitMessage",
+                "git::ToggleFillCommitEditor",
+                "git::ExpandCommitEditor",
+                "git::Cancel",
+                "git::FetchFrom",
+                "git::PushTo",
+                "git::Push",
+                "git::Uncommit",
+                "git::Fetch",
+                "git::PullRebase",
+                "git::Pull",
+                "git::ForcePush",
+                "git::TrashUntrackedFiles",
+                "git::RestoreTrackedFiles",
+                "git::StageAll",
+                "git::UnstageFile",
+                "git::StageFile",
+                "git::StashApply",
+                "git::StashPop",
+                "git::StashAll",
+                "git::UnstageAll",
+                "git::ViewFile",
+                "git::FileHistory"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false
+            }
+          ],
+          "minItems": 2,
+          "maxItems": 2,
+          "deprecationMessage": "This action does not take input - just the action name string should be used."
+        }
+      ]
+    },
+    "UnbindTargetAction": {
+      "anyOf": [
+        {
+          "description": "No action named this.",
+          "type": "string",
+          "const": "",
+          "deprecationMessage": "No action named this."
+        },
+        {
+          "type": "array",
+          "items": [
+            {
+              "description": "No action named this.",
+              "type": "string",
+              "const": "",
+              "deprecationMessage": "No action named this."
+            },
+            true
+          ],
+          "minItems": 2,
+          "maxItems": 2
+        },
+        {
+          "description": "Unstages the current hunk and moves to the next one.",
+          "type": "string",
+          "const": "git::UnstageAndNext"
+        },
+        {
+          "description": "Stages the current hunk and moves to the next one.",
+          "type": "string",
+          "const": "git::StageAndNext"
+        },
+        {
+          "description": "Stage status entries between an anchor entry and the cursor.",
+          "type": "string",
+          "const": "git::StageRange"
+        },
+        {
+          "description": "Toggles the staged state of the hunk or status entry at cursor.",
+          "type": "string",
+          "const": "git::ToggleStaged"
+        },
+        {
+          "description": "Shows git blame information for the current file.",
+          "type": "string",
+          "const": "git::Blame"
+        },
+        {
+          "type": "string",
+          "const": "editor::ToggleGitBlame",
+          "deprecationMessage": "Deprecated, use git::Blame"
+        },
+        {
+          "description": "Restores the selected hunks to their original state and moves to the\nnext one.",
+          "type": "string",
+          "const": "git::RestoreAndNext"
+        },
+        {
+          "description": "Restores the selected hunks to their original state.",
+          "type": "string",
+          "const": "git::Restore"
+        },
+        {
+          "type": "string",
+          "const": "editor::RevertSelectedHunks",
+          "deprecationMessage": "Deprecated, use git::Restore"
+        },
+        {
+          "description": "Restores a file to its last committed state, discarding local changes.",
+          "type": "string",
+          "const": "git::RestoreFile"
+        },
+        {
+          "type": "array",
+          "items": [
+            {
+              "description": "Restores a file to its last committed state, discarding local changes.",
+              "const": "git::RestoreFile"
+            },
+            {
+              "description": "Restores a file to its last committed state, discarding local changes.",
+              "type": "object",
+              "properties": {
+                "skip_prompt": {
+                  "type": "boolean",
+                  "default": false
+                }
+              },
+              "additionalProperties": false
+            }
+          ],
+          "minItems": 2,
+          "maxItems": 2
+        },
+        {
+          "type": "string",
+          "const": "editor::RevertFile",
+          "deprecationMessage": "Deprecated, use git::RestoreFile"
+        },
+        {
+          "type": "array",
+          "items": [
+            {
+              "const": "editor::RevertFile",
+              "deprecationMessage": "Deprecated, use git::RestoreFile"
+            },
+            {
+              "description": "Restores a file to its last committed state, discarding local changes.",
+              "type": "object",
+              "properties": {
+                "skip_prompt": {
+                  "type": "boolean",
+                  "default": false
+                }
+              },
+              "additionalProperties": false
+            }
+          ],
+          "minItems": 2,
+          "maxItems": 2
+        },
+        {
+          "type": "string",
+          "const": "git::ViewCommit"
+        },
+        {
+          "description": "Clones a repository.",
+          "type": "string",
+          "const": "git::Clone"
+        },
+        {
+          "description": "Opens the current file in a solo diff view.",
+          "type": "string",
+          "const": "git::OpenFileDiff"
+        },
+        {
+          "description": "Opens all modified files in the editor.",
+          "type": "string",
+          "const": "git::OpenModifiedFiles"
+        },
+        {
+          "description": "Renames a git branch.",
+          "type": "string",
+          "const": "git::RenameBranch"
+        },
+        {
+          "type": "array",
+          "items": [
+            {
+              "description": "Renames a git branch.",
+              "const": "git::RenameBranch"
+            },
+            {
+              "description": "Renames a git branch.",
+              "type": "object",
+              "properties": {
+                "branch": {
+                  "description": "The branch to rename.\n\nDefault: the current branch.",
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null
+                }
+              },
+              "additionalProperties": false
+            }
+          ],
+          "minItems": 2,
+          "maxItems": 2
+        },
+        {
+          "description": "Copies the current branch name to the clipboard.",
+          "type": "string",
+          "const": "git::CopyBranchName"
+        },
+        {
+          "description": "Adds a file to the repository's .git/info/exclude.",
+          "type": "string",
+          "const": "git::AddToGitInfoExclude"
+        },
+        {
+          "description": "Adds a file to .gitignore.",
+          "type": "string",
+          "const": "git::AddToGitignore"
+        },
+        {
+          "description": "Initializes a new git repository.",
+          "type": "string",
+          "const": "git::Init"
+        },
+        {
+          "description": "Enable the --signoff option.",
+          "type": "string",
+          "const": "git::Signoff"
+        },
+        {
+          "description": "Amends the last commit with staged changes.",
+          "type": "string",
+          "const": "git::Amend"
+        },
+        {
+          "description": "Runs the next commit with `git commit --no-verify`.",
+          "type": "string",
+          "const": "git::SkipHooks"
+        },
+        {
+          "description": "Creates a new commit with staged changes.",
+          "type": "string",
+          "const": "git::Commit"
+        },
+        {
+          "description": "Generates a commit message using AI.",
+          "type": "string",
+          "const": "git::GenerateCommitMessage"
+        },
+        {
+          "description": "Toggles whether the commit message editor fills all the available\nvertical space within the git panel.",
+          "type": "string",
+          "const": "git::ToggleFillCommitEditor"
+        },
+        {
+          "description": "Expands the commit message editor.",
+          "type": "string",
+          "const": "git::ExpandCommitEditor"
+        },
+        {
+          "description": "Cancels the current git operation.",
+          "type": "string",
+          "const": "git::Cancel"
+        },
+        {
+          "description": "Fetches changes from a specific remote.",
+          "type": "string",
+          "const": "git::FetchFrom"
+        },
+        {
+          "description": "Pushes commits to a specific remote branch.",
+          "type": "string",
+          "const": "git::PushTo"
+        },
+        {
+          "description": "Pushes commits to the remote repository.",
+          "type": "string",
+          "const": "git::Push"
+        },
+        {
+          "description": "Undoes the last commit, keeping changes in the working directory.",
+          "type": "string",
+          "const": "git::Uncommit"
+        },
+        {
+          "description": "Fetches changes from the remote repository.",
+          "type": "string",
+          "const": "git::Fetch"
+        },
+        {
+          "description": "Pulls changes from the remote repository with rebase.",
+          "type": "string",
+          "const": "git::PullRebase"
+        },
+        {
+          "description": "Pulls changes from the remote repository.",
+          "type": "string",
+          "const": "git::Pull"
+        },
+        {
+          "description": "Force pushes commits to the remote repository.",
+          "type": "string",
+          "const": "git::ForcePush"
+        },
+        {
+          "description": "Moves all untracked files to trash.",
+          "type": "string",
+          "const": "git::TrashUntrackedFiles"
+        },
+        {
+          "description": "Restores all tracked files to their last committed state.",
+          "type": "string",
+          "const": "git::RestoreTrackedFiles"
+        },
+        {
+          "description": "Stages all changes in the repository.",
+          "type": "string",
+          "const": "git::StageAll"
+        },
+        {
+          "description": "Unstages the current file.",
+          "type": "string",
+          "const": "git::UnstageFile"
+        },
+        {
+          "description": "Stages the current file.",
+          "type": "string",
+          "const": "git::StageFile"
+        },
+        {
+          "description": "Apply the most recent stash.",
+          "type": "string",
+          "const": "git::StashApply"
+        },
+        {
+          "description": "Pops the most recent stash.",
+          "type": "string",
+          "const": "git::StashPop"
+        },
+        {
+          "description": "Stashes all changes in the repository, including untracked files.",
+          "type": "string",
+          "const": "git::StashAll"
+        },
+        {
+          "description": "Unstages all changes in the repository.",
+          "type": "string",
+          "const": "git::UnstageAll"
+        },
+        {
+          "description": "Opens the selected file in the editor without a diff view.",
+          "type": "string",
+          "const": "git::ViewFile"
+        },
+        {
+          "description": "Shows the git history for the selected file, folder, or project.",
+          "type": "string",
+          "const": "git::FileHistory"
+        },
+        {
+          "description": "Runs a sequence of actions.\n\nNOTE: This does **not** wait for asynchronous actions to complete before running the next action.",
+          "type": "string",
+          "const": "action::Sequence"
+        },
+        {
+          "type": "array",
+          "items": [
+            {
+              "description": "Runs a sequence of actions.\n\nNOTE: This does **not** wait for asynchronous actions to complete before running the next action.",
+              "const": "action::Sequence"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/KeymapAction"
+              }
+            }
+          ],
+          "minItems": 2,
+          "maxItems": 2
+        },
+        {
+          "type": "array",
+          "items": [
+            {
+              "enum": [
+                "git::UnstageAndNext",
+                "git::StageAndNext",
+                "git::StageRange",
+                "git::ToggleStaged",
+                "git::Blame",
+                "editor::ToggleGitBlame",
+                "git::RestoreAndNext",
+                "git::Restore",
+                "editor::RevertSelectedHunks",
+                "git::ViewCommit",
+                "git::Clone",
+                "git::OpenFileDiff",
+                "git::OpenModifiedFiles",
+                "git::CopyBranchName",
+                "git::AddToGitInfoExclude",
+                "git::AddToGitignore",
+                "git::Init",
+                "git::Signoff",
+                "git::Amend",
+                "git::SkipHooks",
+                "git::Commit",
+                "git::GenerateCommitMessage",
+                "git::ToggleFillCommitEditor",
+                "git::ExpandCommitEditor",
+                "git::Cancel",
+                "git::FetchFrom",
+                "git::PushTo",
+                "git::Push",
+                "git::Uncommit",
+                "git::Fetch",
+                "git::PullRebase",
+                "git::Pull",
+                "git::ForcePush",
+                "git::TrashUntrackedFiles",
+                "git::RestoreTrackedFiles",
+                "git::StageAll",
+                "git::UnstageFile",
+                "git::StageFile",
+                "git::StashApply",
+                "git::StashPop",
+                "git::StashAll",
+                "git::UnstageAll",
+                "git::ViewFile",
+                "git::FileHistory"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false
+            }
+          ],
+          "minItems": 2,
+          "maxItems": 2,
+          "deprecationMessage": "This action does not take input - just the action name string should be used."
+        }
+      ]
+    },
+    "KeymapSection": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "string",
+          "description": "Determines when these bindings are active. When just a name is provided, like `Editor` or\n`Workspace`, the bindings will be active in that context. Boolean expressions like `X && Y`,\n`X || Y`, `!X` are also supported. Some more complex logic including checking OS and the\ncurrent file extension are also supported - see [the\ndocumentation](https://zed.dev/docs/key-bindings#contexts) for more details.",
+          "default": ""
+        },
+        "use_key_equivalents": {
+          "type": "boolean",
+          "description": "This option enables specifying keys based on their position on a QWERTY keyboard, by using\nposition-equivalent mappings for some non-QWERTY keyboards. This is currently only supported\non macOS. See the documentation for more details.",
+          "default": false
+        },
+        "unbind": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "additionalProperties": {
+            "$ref": "#/$defs/UnbindTargetAction"
+          },
+          "description": "This keymap section's unbindings, as a JSON object mapping keystrokes to actions. These are\nparsed before `bindings`, so bindings later in the same section can still take precedence."
+        },
+        "bindings": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "additionalProperties": {
+            "$ref": "#/$defs/KeymapAction"
+          },
+          "description": "This keymap section's bindings, as a JSON object mapping keystrokes to actions. The\nkeystrokes key is a string representing a sequence of keystrokes to type, where the\nkeystrokes are separated by whitespace. Each keystroke is a sequence of modifiers (`ctrl`,\n`alt`, `shift`, `fn`, `cmd`, `super`, or `win`) followed by a key, separated by `-`. The\norder of bindings does matter. When the same keystrokes are bound at the same context depth,\nthe binding that occurs later in the file is preferred. For displaying keystrokes in the UI,\nthe later binding for the same action is preferred."
+        }
+      },
+      "additionalProperties": true,
+      "description": "Keymap section which binds keystrokes to actions."
+    }
+  },
+  "allowTrailingCommas": true
+}

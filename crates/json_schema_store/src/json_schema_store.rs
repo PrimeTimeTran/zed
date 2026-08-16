@@ -13,7 +13,6 @@ use settings::{LSP_SETTINGS_SCHEMA_URL_PREFIX, Settings as _, SettingsLocation};
 use util::schemars::{AllowTrailingCommas, DefaultDenyUnknownFields};
 
 const SCHEMA_URI_PREFIX: &str = "zed://schemas/";
-
 const TSCONFIG_SCHEMA: &str = include_str!("schemas/tsconfig.json");
 const PACKAGE_JSON_SCHEMA: &str = include_str!("schemas/package.json");
 
@@ -38,9 +37,12 @@ static INSPECTOR_STYLE_SCHEMA: LazyLock<String> = LazyLock::new(|| {
 });
 
 static KEYMAP_SCHEMA: LazyLock<String> = LazyLock::new(|| {
-    serde_json::to_string(&settings::KeymapFile::generate_json_schema_from_inventory())
-        .expect("Keymap schema should serialize")
+    serde_json::to_string(&generate_keymap_schema()).expect("Keymap schema should serialize")
 });
+
+pub fn generate_keymap_schema() -> serde_json::Value {
+    settings::KeymapFile::generate_json_schema_from_inventory()
+}
 
 static ACTION_SCHEMA_CACHE: LazyLock<RwLock<HashMap<String, String>>> =
     LazyLock::new(|| RwLock::new(HashMap::default()));
